@@ -79,8 +79,8 @@ class Arsip extends BaseController
 				'no_arsip' => $this->request->getPost('no_arsip'),
         'nama_file' => $this->request->getPost('nama_file'),
         'deskripsi' => $this->request->getPost('deskripsi'),
-				'tgl_upload' => date('Y-m-d'),
-				'tgl_update' => date('Y-m-d'),
+				'tgl_upload' => date('Y-m-d H:i:s'),
+				'tgl_update' => date('Y-m-d H:i:s'),
         'id_user' => session()->get('id_user'),
         'id_dep' => session()->get('id_dep'),
         'berkas' => $fileName,
@@ -156,7 +156,8 @@ class Arsip extends BaseController
         $this->ModelArsip->update_data($data);
       }else {
         $arsip = $this->ModelArsip->detail_data($id_arsip);
-        if ($arsip['berkas'] != "") {
+        $fileName_old = $arsip['berkas'];
+        if (file_exists("uploads/berkas/".$fileName_old)) {
           unlink('uploads/berkas/'.$arsip['berkas']);
         }
         $fileName = $dataBerkas->getRandomName();
@@ -167,7 +168,7 @@ class Arsip extends BaseController
           'no_arsip' => $this->request->getPost('no_arsip'),
           'nama_file' => $this->request->getPost('nama_file'),
           'deskripsi' => $this->request->getPost('deskripsi'),
-          'tgl_update' => date('Y-m-d'),
+          'tgl_update' => date('Y-m-d H:i:s'),
           'id_user' => session()->get('id_user'),
           'id_dep' => session()->get('id_dep'),
           'berkas' => $fileName,
@@ -194,6 +195,11 @@ class Arsip extends BaseController
   }
 
   public function delete($id_arsip){
+    $arsip =  $this->ModelArsip->detail_data($id_arsip);
+    $fileName = $arsip['berkas'];
+    if (file_exists("uploads/berkas/".$fileName)) {
+      unlink("uploads/berkas/".$fileName);
+    }
     $data = array(
       'id_arsip' => $id_arsip,
     );
